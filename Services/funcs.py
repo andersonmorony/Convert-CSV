@@ -6,6 +6,7 @@ from Services.pdfFunction import dataframe_to_pdf
 import pandas as pd
 from threading import Thread
 import sys
+import json
 sys.path.append('Services')
 
 class Funcs():
@@ -35,7 +36,7 @@ class Funcs():
                 df.to_excel(resultExcelFile, index=False)
                 resultExcelFile.close()
             
-            messagebox.showinfo("Success", "Dowload was a success!") 
+            messagebox.showinfo("Success", "Your file has been successfully converted and saved. 🔄💾") 
 
         except FileNotFoundError as error:
             print(error)
@@ -104,7 +105,7 @@ class Funcs():
                 param = (1, 1) if page_size < 50 else (round(page_size / 50), 1)
                 Thread(target=dataframe_to_pdf(self.dataframe_csv, file.name, param)).start()
             self.loading.set("")
-            messagebox.showinfo("Success", "Dowload was a success!")
+            messagebox.showinfo("Success", "Your file has been successfully converted and saved. 🔄💾")
         except TypeError as error:
             self.loading.set("")
             print(error)
@@ -113,3 +114,13 @@ class Funcs():
             return df.sort_values(by=[f'{column}'], ignore_index=True) 
         except KeyError as error:
             return f"Key not found"
+    def save_Json(self):
+        try:
+            self.loading.set("loading...")
+            with filedialog.asksaveasfile(mode='w', defaultextension=".json") as file:
+                self.dataframe_csv.to_json(file.name, orient='records')
+                self.loading.set("")
+                messagebox.showinfo("Success", "Your file has been successfully converted and saved. 🔄💾") 
+        except TypeError as error:
+            self.loading.set("")
+            print(error)

@@ -79,6 +79,9 @@ class Application(Funcs):
                 
             self.btn_save_was_excel = Button(self.side_menu, text="PDF", bg="#f2f2f2", cursor="hand2", command=self.save_pdf )
             self.btn_save_was_excel.place(relx=0.05, rely=0.46, relwidth=.9, relheight=0.05)
+            
+            self.btn_save_was_json = Button(self.side_menu, text="JSON", bg="#f2f2f2", cursor="hand2", command=self.save_Json )
+            self.btn_save_was_json.place(relx=0.05, rely=0.52, relwidth=.9, relheight=0.05)
 
         self.lb_version = Label(self.side_menu, fg="#f2f2f2", bg="#444444", text="V1.0", font=('verdana', 8, 'bold'))
         self.lb_version.place(relx=0, rely=0.88, relwidth=1, relheight=0.15)
