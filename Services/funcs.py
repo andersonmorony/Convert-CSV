@@ -5,6 +5,8 @@ from tkinter.filedialog import askopenfile
 from Services.pdfFunction import dataframe_to_pdf
 import pandas as pd
 from threading import Thread
+import sys
+sys.path.append('Services')
 
 class Funcs():
     def upload_file(self):
@@ -43,7 +45,7 @@ class Funcs():
         df = pd.read_csv(self.file_path.get())
     def orderBy_column(self, column):
         df = self.dataframe_csv
-        df_sorted = df.sort_values(by=[f'{column}'], ignore_index=True)
+        df_sorted = self.orderBy(df, column)
         self.dataframe_csv = df_sorted
 
         ### Clean treen before insert new values
@@ -95,8 +97,19 @@ class Funcs():
         for item in self.tree.get_children():
             self.tree.delete(item)
     def save_pdf(self):
-        with filedialog.asksaveasfile(mode='w', defaultextension=".pdf") as file:
-            page_size = self.dataframe_csv.shape[0]
-            param = (1, 1) if page_size < 50 else (round(page_size / 50), 1)
-            Thread(target=dataframe_to_pdf(self.dataframe_csv, file.name, param)).start()
-        messagebox.showinfo("Success", "Dowload was a success!") 
+        self.loading.set("loading...")
+        try:
+            with filedialog.asksaveasfile(mode='w', defaultextension=".pdf") as file:
+                page_size = self.dataframe_csv.shape[0]
+                param = (1, 1) if page_size < 50 else (round(page_size / 50), 1)
+                Thread(target=dataframe_to_pdf(self.dataframe_csv, file.name, param)).start()
+            self.loading.set("")
+            messagebox.showinfo("Success", "Dowload was a success!")
+        except TypeError as error:
+            self.loading.set("")
+            print(error)
+    def orderBy(self, df, column):
+        try:
+            return df.sort_values(by=[f'{column}'], ignore_index=True) 
+        except KeyError as error:
+            return f"Key not found"

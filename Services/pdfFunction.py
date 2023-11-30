@@ -34,10 +34,9 @@ def dataframe_to_pdf(df, filename, numpages=(1, 1), pagesize=(11, 8.5)):
                 fig = _draw_as_table(page, pagesize)
                 if nh > 1 or nv > 1:
                     # Add a part/page number at bottom-center of page
-                    fig.text(1, 0.5/pagesize[0],
+                    fig.text(0.5, 0.5/pagesize[0],
                             "Part-{}x{}: Page-{}".format(i+1, j+1, i*nv + j + 1),
                             ha='center', fontsize=8)
                 pdf.savefig(fig, bbox_inches='tight')
                 
                 plt.close()
-    print("PDF done")

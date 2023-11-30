@@ -56,7 +56,7 @@ class Application(Funcs):
         self.lb_information.place(relx= 0.01, rely= 0.60, relheight= 0.05)
         
         ### Add loading label
-        self.lb_loafing = Label(self.frame_1, text="loading...", bd=2, fg='#444444', font=('verdana', 10, 'bold'))
+        self.lb_loafing = Label(self.frame_1, textvariable=self.loading, bd=2, fg='#444444', font=('verdana', 10))
         self.lb_loafing.place(relx= 0.85, rely= 0.95, relwidth=.1, relheight= 0.05)
     def widgets_frame_menu(self):
         # Create an object of tkinter ImageTk
@@ -87,5 +87,6 @@ class Application(Funcs):
         self.file_path = StringVar()
         self.quantity_row = StringVar()
         self.dataframe_csv = []
+        self.loading = StringVar()
     
 Application()
