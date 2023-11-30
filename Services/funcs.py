@@ -1,8 +1,10 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import filedialog, Tk
+from tkinter import ttk, messagebox 
+from tkinter import filedialog
 from tkinter.filedialog import askopenfile
+from Services.pdfFunction import dataframe_to_pdf
 import pandas as pd
+from threading import Thread
 
 class Funcs():
     def upload_file(self):
@@ -23,31 +25,6 @@ class Funcs():
             print(f"Log: FileNotFoundError - {error}")
         except AttributeError as error:
             print(f"Log: AttributeError - {error}")
-    
-        isFirstTime = True
-        quantity_row = Variable()
-        rows = IntVar()
-        for row in data:
-            newValue = rows.get() + 1
-            rows.set(newValue)
-            if isFirstTime:
-                self.listaCli = ttk.Treeview(self.frame_1, height=3, columns=row)
-                self.listaCli.heading("#0", text="")
-                self.listaCli.column("#0", width=0)
-                index = 1
-                for value in row:
-                    self.listaCli.heading(f"#{index}", text=value.capitalize(), command=lambda column = value: self.orderBy_column(column))
-                    index+= 1
-                self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.50)
-                isFirstTime = False 
-            else:
-                self.listaCli.insert("", END, values=row)
-        
-
-        # Add Scroll
-        self.scroolLista = Scrollbar(self.frame_1, orient='vertical')
-        self.listaCli.configure(yscroll=self.scroolLista.set)
-        self.scroolLista.place(relx=0.96, rely=0.1, relwidth=0.04, relheight=0.50)
     def convert_to_excel(self):
         try:
             df = self.dataframe_csv
@@ -55,6 +32,8 @@ class Funcs():
                 resultExcelFile = pd.ExcelWriter(file.name)
                 df.to_excel(resultExcelFile, index=False)
                 resultExcelFile.close()
+            
+            messagebox.showinfo("Success", "Dowload was a success!") 
 
         except FileNotFoundError as error:
             print(error)
@@ -65,6 +44,7 @@ class Funcs():
     def orderBy_column(self, column):
         df = self.dataframe_csv
         df_sorted = df.sort_values(by=[f'{column}'], ignore_index=True)
+        self.dataframe_csv = df_sorted
 
         ### Clean treen before insert new values
         self.clean_treeview()
@@ -101,7 +81,7 @@ class Funcs():
         # Add Scrool
         self.scroolLista = Scrollbar(self.frame_1, orient='vertical')
         self.tree.configure(yscroll=self.scroolLista.set)
-        self.scroolLista.place(relx=0.98, rely=0.1, relwidth=0.04, relheight=0.50)
+        self.scroolLista.place(relx=0.95, rely=0.1, relwidth=0.04, relheight=0.50)
 
         # Add Label with information
         row_count = df.shape[0]  # Returns number of rows
@@ -114,4 +94,9 @@ class Funcs():
     def clean_treeview(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        
+    def save_pdf(self):
+        with filedialog.asksaveasfile(mode='w', defaultextension=".pdf") as file:
+            page_size = self.dataframe_csv.shape[0]
+            param = (1, 1) if page_size < 50 else (round(page_size / 50), 1)
+            Thread(target=dataframe_to_pdf(self.dataframe_csv, file.name, param)).start()
+        messagebox.showinfo("Success", "Dowload was a success!") 

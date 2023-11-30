@@ -3,7 +3,6 @@ from tkinter import Tk
 from PIL import ImageTk, Image  
 from Services.funcs import Funcs
 
-
 root = Tk()
 
 class Application(Funcs):
@@ -55,6 +54,10 @@ class Application(Funcs):
         ### Add information label
         self.lb_information = Label(self.frame_1, textvariable=self.quantity_row, bd=2, fg='#444444', font=('verdana', 8))
         self.lb_information.place(relx= 0.01, rely= 0.60, relheight= 0.05)
+        
+        ### Add loading label
+        self.lb_loafing = Label(self.frame_1, text="loading...", bd=2, fg='#444444', font=('verdana', 10, 'bold'))
+        self.lb_loafing.place(relx= 0.85, rely= 0.95, relwidth=.1, relheight= 0.05)
     def widgets_frame_menu(self):
         # Create an object of tkinter ImageTk
         self.img = ImageTk.PhotoImage(Image.open("images/logo.png"))
@@ -74,7 +77,7 @@ class Application(Funcs):
             self.btn_save_was_excel = Button(self.side_menu, text="Excel", bg="#f2f2f2", cursor="hand2", command=self.convert_to_excel )
             self.btn_save_was_excel.place(relx=0.05, rely=0.4, relwidth=.9, relheight=0.05)
                 
-            self.btn_save_was_excel = Button(self.side_menu, text="PDF", bg="#f2f2f2", cursor="hand2" )
+            self.btn_save_was_excel = Button(self.side_menu, text="PDF", bg="#f2f2f2", cursor="hand2", command=self.save_pdf )
             self.btn_save_was_excel.place(relx=0.05, rely=0.46, relwidth=.9, relheight=0.05)
 
         self.lb_version = Label(self.side_menu, fg="#f2f2f2", bg="#444444", text="V1.0", font=('verdana', 8, 'bold'))
