@@ -6,7 +6,6 @@ from Services.pdfFunction import dataframe_to_pdf
 import pandas as pd
 from threading import Thread
 import sys
-import json
 sys.path.append('Services')
 
 class Funcs():
@@ -44,54 +43,23 @@ class Funcs():
         except ValueError as error:
             print(error)
     def verify_duplicate_item(self):
-        df = pd.read_csv(self.file_path.get())
+        ### Verify if Have duplicated columns
+        df = self.dataframe_csv
+        duplicates = self.dataframe_csv.duplicated()
+        # Filter DataFrame to exclude duplicates
+        filtered_df = df[duplicates]
+        print(filtered_df)
+        return len(filtered_df) > 0
+
     def orderBy_column(self, column):
         df = self.dataframe_csv
-        df_sorted = self.orderBy(df, column)
-        self.dataframe_csv = df_sorted
-
-        ### Clean treen before insert new values
-        self.clean_treeview()
-        
-        tree = self.tree
-        counter = len(df)
-        df_col = df_sorted.columns.values
-        tree["columns"]=(df_col)
-        tree.column("#0", width=0)
-        for x in range(len(df_col)):
-            tree.column(x)
-            tree.heading(x, text=df_col[x].capitalize(), command=lambda column = df_col[x]: self.orderBy_column(column))
-
-        for i in range(counter):
-            tree.insert('', END, values=df_sorted.iloc[i,:].tolist())
-
-        tree.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.50)
+        order_by = self.order_by.get() == 0
+        df_sorted = self.orderBy(df, column, order_by)
+        self.update_treeview(df_sorted)       
     def read_csv(self):
         df = pd.DataFrame(self.dataframe_csv)
         self.tree = ttk.Treeview(self.frame_1)
-        counter = len(df)
-        df_col = df.columns.values
-        self.tree["columns"]=(df_col)
-        self.tree.column("#0", width=0)
-        for x in range(len(df_col)):
-            self.tree.column(x, width=100)
-            self.tree.heading(x, text=df_col[x].capitalize(), command=lambda column = df_col[x]: self.orderBy_column(column))
-
-        for i in range(counter):
-            self.tree.insert('', END, values=df.iloc[i,:].tolist())
-        
-        self.tree.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.50)
-        
-        # Add Scrool
-        self.scroolLista = Scrollbar(self.frame_1, orient='vertical')
-        self.tree.configure(yscroll=self.scroolLista.set)
-        self.scroolLista.place(relx=0.95, rely=0.1, relwidth=0.04, relheight=0.50)
-
-        # Add Label with information
-        row_count = df.shape[0]  # Returns number of rows
-        col_count = df.shape[1]  # Returns number of columns
-        self.quantity_row.set(f"{col_count} column and {row_count} rows was loaded.")
-
+        self.update_treeview(df)
         # Show Button in side frame
         self.showButtons.set(True)  
         self.widgets_frame_menu()
@@ -110,9 +78,9 @@ class Funcs():
         except TypeError as error:
             self.loading.set("")
             print(error)
-    def orderBy(self, df, column):
+    def orderBy(self, df, column, asc=True):
         try:
-            return df.sort_values(by=[f'{column}'], ignore_index=True) 
+            return df.sort_values(by=[f'{column}'], ignore_index=True, ascending=asc) 
         except KeyError as error:
             return f"Key not found"
     def save_Json(self):
@@ -126,7 +94,43 @@ class Funcs():
             self.loading.set("")
             print(error)
     def split_string_name(self, text, delimiter):
-        print(text)
         array_text = text.split(delimiter)
         count = len(array_text)
         return array_text[count - 1]
+    def remove_duplicate_values(self):
+        if self.verify_duplicate_item():
+            df = self.dataframe_csv.drop_duplicates()
+            self.dataframe_csv = df
+            self.update_treeview(df)
+            messagebox.showinfo("Success", "Your CSV file is free of duplicate values!")
+        else:
+            messagebox.showinfo("Info", "Your CSV file don't have duplicate values.")
+    def update_treeview(self, df):
+        self.dataframe_csv = df
+        
+        ### Clean treen before insert new values
+        self.clean_treeview()
+        
+        tree = self.tree
+        counter = len(df)
+        df_col = df.columns.values
+        tree["columns"]=(df_col)
+        tree.column("#0", width=0)
+        for x in range(len(df_col)):
+            tree.column(x)
+            tree.heading(x, text=df_col[x].capitalize(), command=lambda column = df_col[x]: self.orderBy_column(column))
+
+        for i in range(counter):
+            tree.insert('', END, values=df.iloc[i,:].tolist())
+
+        tree.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.50)
+
+        # Add Scrool
+        self.scroolLista = Scrollbar(self.frame_1, orient='vertical')
+        self.tree.configure(yscroll=self.scroolLista.set)
+        self.scroolLista.place(relx=0.97, rely=0.1, relwidth=0.03, relheight=0.50)
+
+        # Add Label with information
+        row_count = df.shape[0]  # Returns number of rows
+        col_count = df.shape[1]  # Returns number of columns
+        self.quantity_row.set(f"{col_count} column and {row_count} rows was loaded.")
