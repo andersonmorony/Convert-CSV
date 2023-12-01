@@ -20,7 +20,8 @@ class Funcs():
             self.dataframe_csv = df
 
             ### upload filename label
-            self.filename.set(file_path.name)
+            filename = self.split_string_name(file_path.name, '/')
+            self.filename.set(filename)
 
             ### read csv
             self.read_csv()
@@ -124,3 +125,8 @@ class Funcs():
         except TypeError as error:
             self.loading.set("")
             print(error)
+    def split_string_name(self, text, delimiter):
+        print(text)
+        array_text = text.split(delimiter)
+        count = len(array_text)
+        return array_text[count - 1]
