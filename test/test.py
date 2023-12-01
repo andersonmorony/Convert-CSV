@@ -20,6 +20,16 @@ def test_order_column():
     assert data_sorted.iloc[2]['A'] == 4
     assert data_sorted.iloc[3]['A'] == 5
     assert data_sorted.iloc[7]['A'] == 68
+
+def test_order_column_desc():
+    funtions = Funcs()
+    df = pd.DataFrame({'A': [9,1,4,5,68,6,23,2]})
+    data_sorted = funtions.orderBy(df, 'A', False)
+
+    assert data_sorted.iloc[0]['A'] == 68
+    assert data_sorted.iloc[1]['A'] == 23
+    assert data_sorted.iloc[2]['A'] == 9
+    assert data_sorted.iloc[7]['A'] == 1
     
 def test_should_return_msg_error_order_column():
     a = Funcs()
