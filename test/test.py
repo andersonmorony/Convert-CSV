@@ -28,4 +28,11 @@ def test_should_return_msg_error_order_column():
 
     assert data_sorted == "Key not found"
 
+def test_should_return_value():
+    funcs = Funcs()
+    expected = "fake_file.csv"
+    filename = "c://fakepath/fake/fake_file.csv"
+    res = funcs.split_string_name(filename, '/')
+    assert res == expected
+
 pytest.main(["-v", "--tb=line", "-rN", __file__])
